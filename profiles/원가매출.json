@@ -1,0 +1,36 @@
+{
+  "profileName": "원가매출",
+  "description": "원가매출 데이터 추출용 프로필",
+  "version": "1.0",
+
+  "columns": [
+    { "source": "기간/연도", "target": "연도", "required": true },
+    { "source": "전표 번호", "target": "전표번호", "required": true },
+    { "source": "회사 코드", "target": "회사코드" },
+    { "source": "코스트 센터", "target": "CC" },
+    { "source": "손익 센터", "target": "PC" },
+    { "source": "원가요소", "target": "원가요소" },
+    { "source": "비즈니스채널", "target": "채널" },
+    { "source": "스토어 브랜드 ID", "target": "브랜드ID" },
+    { "source": "상품 매출원가", "target": "상품원가", "type": "number" },
+    { "source": "제품 매출원가", "target": "제품원가", "type": "number" },
+    { "source": "임대매출원가", "target": "임대원가", "type": "number" }
+  ],
+
+  "calculations": [
+    {
+      "newColumn": "총원가",
+      "formula": "${상품 매출원가} + ${제품 매출원가} + ${임대매출원가}",
+      "insertAfter": "임대원가"
+    }
+  ],
+
+  "options": {
+    "skipEmptyRows": true,
+    "trimWhitespace": true,
+    "outputEncoding": "UTF-8-BOM",
+    "delimiter": ","
+  },
+
+  "outputFileName": "cogs_result.csv"
+}

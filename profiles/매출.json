@@ -1,0 +1,33 @@
+{
+  "profileName": "매출",
+  "description": "매출 데이터 추출용 프로필",
+  "version": "1.0",
+
+  "columns": [
+    { "source": "기간/연도", "target": "year/month", "required": true },
+    { "source": "전표 번호", "target": "document_number", "required": true },
+    { "source": "회사 코드", "target": "company_code" },
+    { "source": "코스트 센터", "target": "cost_center" },
+    { "source": "손익 센터", "target": "profit_center" },
+    { "source": "비즈니스채널", "target": "channel" },
+    { "source": "스토어 브랜드 ID", "target": "store_brand_code" },
+    { "source": "매출", "target": "revenue", "type": "number" }
+  ],
+
+  "calculations": [
+    {
+      "newColumn": "총매출",
+      "formula": "${상품 매출} + ${제품 매출}",
+      "insertAfter": "제품매출"
+    }
+  ],
+
+  "options": {
+    "skipEmptyRows": true,
+    "trimWhitespace": true,
+    "outputEncoding": "UTF-8-BOM",
+    "delimiter": ","
+  },
+
+  "outputFileName": "sales_result.csv"
+}
