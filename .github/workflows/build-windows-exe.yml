@@ -1,0 +1,75 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        shell: bash
+
+      - name: Build JAR
+        run: ./gradlew jar
+
+      - name: Create EXE with jpackage
+        run: |
+          # 디렉토리 생성
+          mkdir -p build/jpackage-input
+          mkdir -p build/jpackage
+
+          # JAR 복사
+          cp build/libs/ExcelConverter-1.0.jar build/jpackage-input/
+
+          # profiles 폴더 복사
+          if (Test-Path profiles) {
+            Copy-Item -Path profiles -Destination build/jpackage-input/profiles -Recurse
+          }
+
+          # jpackage 실행
+          jpackage `
+            --input build/jpackage-input `
+            --main-jar ExcelConverter-1.0.jar `
+            --name ExcelConverter `
+            --app-version 1.0 `
+            --vendor "Musinsa" `
+            --description "Excel/CSV Data Converter" `
+            --dest build/jpackage `
+            --type exe `
+            --win-menu `
+            --win-shortcut `
+            --win-dir-chooser
+        shell: pwsh
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExcelConverter-Windows
+          path: build/jpackage/*.exe
+          retention-days: 30
+
+      - name: Upload to Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/jpackage/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
